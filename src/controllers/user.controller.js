@@ -4,7 +4,8 @@ const userService = require("../services/user.service");
 const register = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
-    const user = await userService.registerUser(name, email, password, role);
+    const profileImage = req.file ? req.file.filename : null;  // get uploaded file
+    const user = await userService.registerUser(name, email, password, role, profileImage);
     res.status(201).json({ message: "User registered successfully", user });
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -45,7 +46,9 @@ const getUserById = async (req, res) => {
 // UPDATE USER
 const updateUser = async (req, res) => {
   try {
-    const user = await userService.updateUser(req.params.id, req.body);
+    const data = { ...req.body };
+    if (req.file) data.profileImage = req.file.filename;  // update image if uploaded
+    const user = await userService.updateUser(req.params.id, data);
     res.status(200).json({ message: "User updated successfully", user });
   } catch (error) {
     res.status(400).json({ message: error.message });
